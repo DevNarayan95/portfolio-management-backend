@@ -7,14 +7,6 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"],
-      "@config/*": ["src/config/*"],
-      "@modules/*": ["src/modules/*"],
-      "@common/*": ["src/common/*"],
-      "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"]
-    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -24,7 +16,17 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@config/*": ["src/config/*"],
+      "@modules/*": ["src/modules/*"],
+      "@common/*": ["src/common/*"],
+      "@utils/*": ["src/utils/*"],
+      "@types/*": ["src/types/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
