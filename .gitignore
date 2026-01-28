@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+coverage/
+
+# env
+.env
+.env.*
+!.env.example
+
+# logs
+logs/
+*.log
+
+# OS
+.DS_Store
+
+# prisma
+prisma/dev.db
