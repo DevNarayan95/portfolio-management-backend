@@ -1,4 +1,3 @@
-// src/modules/auth/controllers/auth.controller.ts
 import {
   Controller,
   Post,

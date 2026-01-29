@@ -91,7 +91,9 @@ export class AuthService {
     const tokens = this.generateTokens(user.id, user.email);
 
     // Store refresh token in database (7 days expiration)
-    const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const refreshTokenExpiresAt = new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000,
+    );
     await this.authRepository.createRefreshToken(
       user.id,
       tokens.refreshToken,
@@ -114,8 +116,11 @@ export class AuthService {
    * @param userId User ID
    */
   async logout(userId: string): Promise<void> {
-    const deletedCount = await this.authRepository.deleteRefreshTokensByUser(userId);
-    this.logger.log(`User ${userId} logged out (${deletedCount} tokens deleted)`);
+    const deletedCount =
+      await this.authRepository.deleteRefreshTokensByUser(userId);
+    this.logger.log(
+      `User ${userId} logged out (${deletedCount} tokens deleted)`,
+    );
   }
 
   /**
@@ -125,7 +130,8 @@ export class AuthService {
    * @returns Access and refresh tokens
    */
   private generateTokens(userId: string, email: string): TokenResponse {
-    const jwtRefreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
+    const jwtRefreshSecret =
+      this.configService.get<string>('JWT_REFRESH_SECRET');
 
     if (!jwtRefreshSecret) {
       throw new Error('JWT_REFRESH_SECRET not configured in environment');
@@ -159,13 +165,17 @@ export class AuthService {
    * @throws BadRequestException if refresh token is missing
    * @throws UnauthorizedException if token is invalid or expired
    */
-  async refreshToken(userId: string, refreshToken: string): Promise<{ accessToken: string }> {
+  async refreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<{ accessToken: string }> {
     if (!refreshToken) {
       throw new BadRequestException('Refresh token is required');
     }
 
     // Find stored token
-    const storedToken = await this.authRepository.findRefreshToken(refreshToken);
+    const storedToken =
+      await this.authRepository.findRefreshToken(refreshToken);
 
     if (!storedToken || storedToken.userId !== userId) {
       this.logger.warn(`Invalid refresh token for user ${userId}`);

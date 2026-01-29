@@ -46,7 +46,9 @@ export class AuthRepository {
    * @param registerDto Registration data with hashed password
    * @returns Newly created user
    */
-  async createUser(registerDto: RegisterDto & { password: string }): Promise<User> {
+  async createUser(
+    registerDto: RegisterDto & { password: string },
+  ): Promise<User> {
     try {
       const { email, password, firstName, lastName, phone } = registerDto;
       return await this.prisma.user.create({
@@ -71,7 +73,11 @@ export class AuthRepository {
    * @param expiresAt Token expiration date
    * @returns Created refresh token
    */
-  async createRefreshToken(userId: string, token: string, expiresAt: Date): Promise<RefreshToken> {
+  async createRefreshToken(
+    userId: string,
+    token: string,
+    expiresAt: Date,
+  ): Promise<RefreshToken> {
     try {
       return await this.prisma.refreshToken.create({
         data: {
@@ -81,7 +87,10 @@ export class AuthRepository {
         },
       });
     } catch (error) {
-      this.logger.error(`Error creating refresh token for user: ${userId}`, error);
+      this.logger.error(
+        `Error creating refresh token for user: ${userId}`,
+        error,
+      );
       throw error;
     }
   }
@@ -114,7 +123,10 @@ export class AuthRepository {
       });
       return result.count;
     } catch (error) {
-      this.logger.error(`Error deleting refresh tokens for user: ${userId}`, error);
+      this.logger.error(
+        `Error deleting refresh tokens for user: ${userId}`,
+        error,
+      );
       throw error;
     }
   }

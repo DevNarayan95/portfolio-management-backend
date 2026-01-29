@@ -33,7 +33,12 @@ export default registerAs('app', () => ({
   },
 
   logging: {
-    level: (process.env.LOG_LEVEL || 'debug') as 'error' | 'warn' | 'info' | 'debug' | 'trace',
+    level: (process.env.LOG_LEVEL || 'debug') as
+      | 'error'
+      | 'warn'
+      | 'info'
+      | 'debug'
+      | 'trace',
     directory: process.env.LOG_DIR || './logs',
   },
 }));

@@ -1,7 +1,9 @@
 import * as Joi from 'joi';
 
 export const configValidationSchema = Joi.object({
-  NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
+  NODE_ENV: Joi.string()
+    .valid('development', 'production', 'test')
+    .default('development'),
 
   APP_NAME: Joi.string().default('Portfolio Management System'),
   APP_VERSION: Joi.string().default('1.0.0'),
@@ -25,6 +27,8 @@ export const configValidationSchema = Joi.object({
   JWT_REFRESH_SECRET: Joi.string().required().min(32),
   JWT_REFRESH_EXPIRATION: Joi.string().default('7d'),
 
-  LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'debug', 'trace').default('debug'),
+  LOG_LEVEL: Joi.string()
+    .valid('error', 'warn', 'info', 'debug', 'trace')
+    .default('debug'),
   LOG_DIR: Joi.string().default('./logs'),
 });
