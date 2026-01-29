@@ -15,10 +15,9 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
   ApiParam,
-  ApiHeader,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { InvestmentService } from '../services/investment.service';
 import {
@@ -61,12 +60,6 @@ export class InvestmentController {
     name: 'portfolioId',
     description: 'Portfolio ID',
     example: 'clnxx123xxx',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiBody({
     type: CreateInvestmentDto,
@@ -120,12 +113,6 @@ export class InvestmentController {
     description: 'Portfolio ID',
     example: 'clnxx123xxx',
   })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
-  })
   @ApiResponse({
     status: 200,
     description: 'List of investments retrieved successfully',
@@ -173,12 +160,6 @@ export class InvestmentController {
     name: 'investmentId',
     description: 'Investment ID',
     example: 'clnxx456yyy',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
@@ -293,12 +274,6 @@ export class InvestmentController {
     description: 'Investment ID',
     example: 'clnxx456yyy',
   })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
-  })
   @ApiResponse({
     status: 200,
     description: 'Investment details retrieved successfully',
@@ -347,12 +322,6 @@ export class InvestmentController {
     name: 'investmentId',
     description: 'Investment ID',
     example: 'clnxx456yyy',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiBody({
     type: UpdateInvestmentDto,
@@ -413,12 +382,6 @@ export class InvestmentController {
     name: 'investmentId',
     description: 'Investment ID',
     example: 'clnxx456yyy',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 204,

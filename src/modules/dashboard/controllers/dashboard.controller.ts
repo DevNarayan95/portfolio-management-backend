@@ -12,10 +12,9 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
   ApiParam,
   ApiQuery,
-  ApiHeader,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { DashboardService } from '../services/dashboard.service';
 import {
@@ -53,12 +52,6 @@ export class DashboardController {
     description:
       'Retrieve comprehensive dashboard summary across all portfolios including total investments, gains/losses, and asset breakdown.',
   })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
-  })
   @ApiResponse({
     status: 200,
     description: 'Dashboard summary retrieved successfully',
@@ -88,12 +81,6 @@ export class DashboardController {
     name: 'portfolioId',
     description: 'Portfolio ID',
     example: 'clnxx123xxx',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
@@ -137,12 +124,6 @@ export class DashboardController {
     description: 'Portfolio ID',
     example: 'clnxx123xxx',
   })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
-  })
   @ApiResponse({
     status: 200,
     description: 'Investment performances retrieved successfully',
@@ -184,12 +165,6 @@ export class DashboardController {
     name: 'portfolioId',
     description: 'Portfolio ID',
     example: 'clnxx123xxx',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
@@ -238,12 +213,6 @@ export class DashboardController {
     required: false,
     description: 'Number of results (default: 5)',
     example: 5,
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
@@ -294,12 +263,6 @@ export class DashboardController {
     required: false,
     description: 'Number of results (default: 5)',
     example: 5,
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,

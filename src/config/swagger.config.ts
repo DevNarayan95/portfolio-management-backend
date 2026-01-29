@@ -18,8 +18,6 @@ export const setupSwagger = (
     configService.get<string>('app.description') ??
     'API for managing investment portfolios with JWT authentication, multi-asset support, and transaction tracking.';
 
-  const apiPrefix = configService.get<string>('app.apiPrefix') ?? 'api';
-
   const developerName =
     configService.get<string>('app.developer.name') ?? 'Narayan Shaw';
 
@@ -83,9 +81,9 @@ export const setupSwagger = (
     .addTag('Health', 'Health & system checks')
 
     /* ---------- Servers ---------- */
-    .addServer(`${devServer}/${apiPrefix}`, 'Development')
-    .addServer(`${stagingServer}/${apiPrefix}`, 'Staging')
-    .addServer(`${prodServer}/${apiPrefix}`, 'Production')
+    .addServer(`${devServer}`, 'Development')
+    .addServer(`${stagingServer}`, 'Staging')
+    .addServer(`${prodServer}`, 'Production')
 
     /* ---------- Contact & Legal ---------- */
     .setContact(

@@ -13,9 +13,8 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
   ApiBody,
-  ApiHeader,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
 import { AuthRepository } from '../repositories/auth.repository';
@@ -33,6 +32,7 @@ interface AuthenticatedRequest extends Request {
  */
 @ApiTags('Auth')
 @Controller('auth')
+@ApiBearerAuth('JWT-auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -144,17 +144,10 @@ export class AuthController {
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtGuard)
-  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Refresh access token',
     description:
       'Generate a new access token using the refresh token stored in the Authorization header. The refresh token must be valid and not expired. Returns a new short-lived access token.',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (refresh token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
@@ -224,17 +217,10 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtGuard)
-  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Logout user',
     description:
       'Logout the authenticated user by invalidating all refresh tokens. After logout, the user will need to login again to access protected resources.',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
@@ -265,17 +251,10 @@ export class AuthController {
    */
   @Get('me')
   @UseGuards(JwtGuard)
-  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get current user profile',
     description:
       'Retrieve the current authenticated user profile information including email, name, and phone number. Requires valid JWT access token.',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,

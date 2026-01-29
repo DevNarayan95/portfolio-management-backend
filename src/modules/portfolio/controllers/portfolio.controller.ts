@@ -15,8 +15,8 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { PortfolioService } from '../services/portfolio.service';
 import {

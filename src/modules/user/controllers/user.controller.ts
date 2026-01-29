@@ -15,7 +15,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiHeader,
   ApiBody,
 } from '@nestjs/swagger';
 import { UserService } from '../services/user.service';
@@ -49,12 +48,6 @@ export class UserController {
     summary: 'Get current user profile',
     description: 'Retrieve the authenticated user profile information.',
   })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
-  })
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved successfully',
@@ -83,12 +76,6 @@ export class UserController {
     summary: 'Update user profile',
     description:
       'Update user profile information such as name and phone number. At least one field must be provided.',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiBody({
     type: UpdateProfileDto,
@@ -127,12 +114,6 @@ export class UserController {
     summary: 'Change user password',
     description:
       'Change user password by verifying the current password first. New password must meet security requirements.',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiBody({
     type: ChangePasswordDto,
@@ -178,12 +159,6 @@ export class UserController {
     summary: 'Delete user account',
     description:
       'Permanently delete the user account (soft delete). Requires password confirmation. This action is irreversible.',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiBody({
     schema: {
@@ -233,12 +208,6 @@ export class UserController {
     summary: 'Get user statistics',
     description:
       'Retrieve comprehensive statistics including portfolio count, investments, and overall performance.',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,

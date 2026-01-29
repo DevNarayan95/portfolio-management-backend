@@ -17,7 +17,6 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
-  ApiHeader,
   ApiBody,
 } from '@nestjs/swagger';
 import { TransactionService } from '../services/transaction.service';
@@ -65,12 +64,6 @@ export class TransactionController {
     name: 'investmentId',
     description: 'Investment ID',
     example: 'clnxx456yyy',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiBody({
     type: CreateTransactionDto,
@@ -125,12 +118,6 @@ export class TransactionController {
     name: 'portfolioId',
     description: 'Portfolio ID',
     example: 'clnxx123xxx',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
@@ -222,12 +209,6 @@ export class TransactionController {
     description: 'Portfolio ID',
     example: 'clnxx123xxx',
   })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
-  })
   @ApiQuery({
     name: 'type',
     required: false,
@@ -312,12 +293,6 @@ export class TransactionController {
     name: 'investmentId',
     description: 'Investment ID',
     example: 'clnxx456yyy',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiQuery({
     name: 'type',
@@ -404,12 +379,6 @@ export class TransactionController {
     name: 'transactionId',
     description: 'Transaction ID',
     example: 'clnxx789zzz',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer token (access token)',
-    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    required: true,
   })
   @ApiResponse({
     status: 200,
