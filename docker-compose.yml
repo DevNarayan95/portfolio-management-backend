@@ -42,7 +42,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./logs:/app/logs
-      - /app/node_modules # ✅ Prevent volume override of node_modules
+      - /app/node_modules
     networks:
       - portfolio_network
 
