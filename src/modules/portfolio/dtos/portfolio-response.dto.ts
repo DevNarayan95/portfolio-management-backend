@@ -1,4 +1,3 @@
-// src/modules/portfolio/dtos/portfolio-response.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class PortfolioResponseDto {

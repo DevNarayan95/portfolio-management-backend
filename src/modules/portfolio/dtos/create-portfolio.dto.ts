@@ -1,4 +1,3 @@
-// src/modules/portfolio/dtos/create-portfolio.dto.ts
 import { IsString, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 

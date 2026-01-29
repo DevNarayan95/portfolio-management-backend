@@ -1,4 +1,3 @@
-// src/modules/portfolio/interfaces/portfolio.interface.ts
 export interface IPortfolio {
   id: string;
   userId: string;

@@ -1,4 +1,3 @@
-// src/modules/portfolio/repositories/portfolio.repository.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Portfolio, Investment } from '@prisma/client';
