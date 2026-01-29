@@ -1,4 +1,3 @@
-// src/modules/dashboard/dtos/investment-performance.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 
 export class InvestmentPerformanceDto {

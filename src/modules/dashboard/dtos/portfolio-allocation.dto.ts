@@ -1,4 +1,3 @@
-// src/modules/dashboard/dtos/portfolio-allocation.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PortfolioAllocationDto {

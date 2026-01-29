@@ -1,4 +1,3 @@
-// src/modules/dashboard/interfaces/dashboard.interface.ts
 export interface IDashboardSummary {
   userEmail: string;
   totalInvestedAllPortfolios: number;
