@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/nestjs/nest/master/logo.svg" width="120" alt="NestJS Logo" />
   <h1>📊 Portfolio Management System (PMS) - Backend</h1>
   <p><strong>Production-ready Investment Portfolio Management API</strong></p>
   
@@ -11,8 +10,6 @@
   
   [📚 Full Documentation](https://devnarayan95.github.io/portfolio-management-docs/) • [🌐 Live Demo](#) • [🚀 Quick Start](#-quick-start)
 </div>
-
----
 
 ## 📋 Table of Contents
 
@@ -28,7 +25,7 @@
 - [🔒 Security](#-security)
 - [🤝 Contributing](#-contributing)
 
----
+<br>
 
 ## ✨ Features
 
@@ -54,7 +51,7 @@
 - 📈 **Scalable Design** - Supports 100,000+ concurrent users
 - 📝 **Type Safety** - Full TypeScript implementation
 
----
+<br>
 
 ## 🛠️ Tech Stack
 
@@ -83,7 +80,7 @@
   </tr>
 </table>
 
----
+<br>
 
 ## 📦 Prerequisites
 
@@ -101,7 +98,7 @@ psql --version    # 15.x or higher
 docker --version  # 24.x or higher
 ```
 
----
+<br>
 
 ## 🚀 Quick Start
 
@@ -159,12 +156,12 @@ You should see:
 🔧 Environment: development
 ```
 
+<br>
+
 ### 6️⃣ Access Documentation
 
 - **Swagger API**: http://localhost:3000/api-docs
 - **Full Documentation**: https://devnarayan95.github.io/portfolio-management-docs/
-
----
 
 ## 📖 API Documentation
 
@@ -211,7 +208,7 @@ For complete API documentation with examples, request/response schemas, and inte
 - `GET /dashboard/portfolio/:portfolioId/summary` - Portfolio summary
 - `GET /dashboard/portfolio/:portfolioId/allocation` - Asset allocation
 
----
+<br>
 
 ## 🏗️ Project Structure
 
@@ -239,7 +236,7 @@ portfolio-management-backend/
 └── .env.example            # Environment template
 ```
 
----
+<br>
 
 ## 🌍 Environment Configuration
 
@@ -263,8 +260,8 @@ APP_SERVER_URL=http://localhost:3000
 # ==============================================
 # DEVELOPER INFO
 # ==============================================
-APP_DEVELOPER_NAME=Narayan Shaw
-APP_DEVELOPER_EMAIL=nshaw.dev@gmail.com
+APP_DEVELOPER_NAME=Developer_name
+APP_DEVELOPER_EMAIL=test@example.com
 
 # ==============================================
 # DATABASE CONFIGURATION
@@ -324,7 +321,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 **⚠️ Never commit `.env` files to git!**
 
----
+<br>
 
 ## 📝 Available Scripts
 
@@ -367,7 +364,7 @@ npm run docker:logs    # View logs
 npm run docker:restart # Restart API
 ```
 
----
+<br>
 
 ## 🐳 Docker Setup
 
@@ -403,7 +400,7 @@ docker-compose build --no-cache
 docker-compose exec api npm run db:migrate:dev
 ```
 
----
+<br>
 
 ## 🔒 Security
 
@@ -440,7 +437,7 @@ docker-compose exec api npm run db:migrate:dev
 - Set appropriate CORS origins
 - Disable Swagger (set `ENABLE_SWAGGER=false`)
 
----
+<br>
 
 ## 🐛 Troubleshooting
 
@@ -491,7 +488,7 @@ docker-compose up -d
 docker-compose logs -f
 ```
 
----
+<br>
 
 ## 🤝 Contributing
 
@@ -541,7 +538,7 @@ npm run lint       # Check linting
 npm run format     # Format code
 ```
 
----
+<br>
 
 ## 📞 Support & Resources
 
@@ -564,7 +561,7 @@ npm run format     # Format code
 - **Email**: nshaw.dev@gmail.com
 - **GitHub**: [@DevNarayan95](https://github.com/DevNarayan95)
 
----
+<br>
 
 ## 🌟 Acknowledgments
 
@@ -573,6 +570,9 @@ npm run format     # Format code
 - [PostgreSQL](https://www.postgresql.org/) - Powerful open-source database
 - [Pino](https://getpino.io/) - Fast JSON logger
 - [Docker](https://www.docker.com/) - Containerization platform
+- [Claude](https://claude.ai/) - AI platform
+
+<br>
 
 ---
 
@@ -583,8 +583,6 @@ npm run format     # Format code
 **[⬆ Back to top](#-portfolio-management-system-pms---backend)**
 
 **[⭐ Star us on GitHub!](https://github.com/DevNarayan95/portfolio-management-backend)**
-
----
 
 **Version 1.0.0** • Last Updated: January 29, 2026
 
