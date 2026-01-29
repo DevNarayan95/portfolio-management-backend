@@ -1,14 +1,123 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  firstName String?
+  lastName  String?
+  phone     String?
+  
+  portfolios Portfolio[]
+  refreshTokens RefreshToken[]
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  
+  @@index([email])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Portfolio {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  
+  investments Investment[]
+  transactions Transaction[]
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  
+  @@index([userId])
+  @@map("portfolios")
+}
+
+model Investment {
+  id              String   @id @default(cuid())
+  portfolioId     String
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  
+  type            InvestmentType
+  name            String
+  symbol          String?
+  quantity        Float
+  currentPrice    Float
+  purchasePrice   Float
+  purchaseDate    DateTime
+  notes           String?
+  
+  isSIP           Boolean  @default(false)
+  sipAmount       Float?
+  sipStartDate    DateTime?
+  sipDuration     Int?
+  
+  transactions    Transaction[]
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  
+  @@index([portfolioId])
+  @@map("investments")
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  investmentId    String
+  investment      Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+  
+  portfolioId     String
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  
+  type            TransactionType
+  quantity        Float
+  price           Float
+  amount          Float
+  transactionDate DateTime
+  notes           String?
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@index([investmentId])
+  @@index([portfolioId])
+  @@map("transactions")
+}
+
+enum InvestmentType {
+  MUTUAL_FUND
+  STOCK
+  BOND
+  CRYPTOCURRENCY
+}
+
+enum TransactionType {
+  BUY
+  SELL
 }

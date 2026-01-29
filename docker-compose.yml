@@ -6,19 +6,15 @@ services:
     image: postgres:15-alpine
     container_name: portfolio_management_postgres
     environment:
-      POSTGRES_USER: portfolio_user
-      POSTGRES_PASSWORD: portfolio_password
-      POSTGRES_DB: portfolio_management_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: portfolio_db
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'pg_isready -U portfolio_user -d portfolio_management_dev',
-        ]
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d portfolio_db']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,7 +29,7 @@ services:
     container_name: portfolio_management_api
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://portfolio_user:portfolio_password@postgres:5432/portfolio_management_dev
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/portfolio_db
       PORT: 3000
       JWT_SECRET: a9f7d2c1e4b84c5a8f3d9b2c6e7a4f1d8c0b5a9e3d7f2c6b1e8a4d9f3c7b2
       JWT_REFRESH_SECRET: f4e9c2b7a1d8c6e3b5f9a0d2e7c4a8b1f6d9c3e5a7b8d0f2c9a1e4
@@ -46,7 +42,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./logs:/app/logs
-    command: npm run start:dev
+      - /app/node_modules # ✅ Prevent volume override of node_modules
     networks:
       - portfolio_network
 
