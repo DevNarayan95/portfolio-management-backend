@@ -33,7 +33,7 @@ interface AuthenticatedRequest extends Request {
  * User Controller
  * Handles user profile, settings, and account management
  */
-@ApiTags('Users')
+@ApiTags('User')
 @Controller('users')
 @UseGuards(JwtGuard)
 @ApiBearerAuth('JWT-auth')
