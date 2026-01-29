@@ -156,12 +156,12 @@ You should see:
 🔧 Environment: development
 ```
 
-<br>
-
 ### 6️⃣ Access Documentation
 
 - **Swagger API**: http://localhost:3000/api-docs
 - **Full Documentation**: https://devnarayan95.github.io/portfolio-management-docs/
+
+<br>
 
 ## 📖 API Documentation
 
