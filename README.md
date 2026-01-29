@@ -1,6 +1,6 @@
 <div align="center">
   <h1>📊 Portfolio Management System (PMS) - Backend</h1>
-  <p><strong>Production-ready Investment Portfolio Management API</strong></p>
+  <p><strong>Professional Investment Portfolio Management API</strong></p>
   
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
   [![NestJS](https://img.shields.io/badge/NestJS-11.x-E0234E?style=flat-square&logo=nestjs)](https://nestjs.com/)
