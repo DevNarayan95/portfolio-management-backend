@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { User, Portfolio, Investment } from '@prisma/client';
+import { ITransaction } from '@/modules/transaction/interfaces/transaction.interface';
 
 interface PortfolioWithInvestments extends Portfolio {
   investments: Investment[];
-  transactions: any[];
+  transactions: ITransaction[];
 }
 
 interface UserWithPortfolios extends User {

@@ -54,8 +54,6 @@ export class AuthService {
       // Generate tokens
       const tokens = this.generateTokens(user.id, user.email);
 
-      this.logger.log(`User ${email} registered successfully`);
-
       return {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
@@ -109,8 +107,6 @@ export class AuthService {
         tokens.refreshToken,
         refreshTokenExpiresAt,
       );
-
-      this.logger.log(`User ${email} logged in successfully`);
 
       return {
         accessToken: tokens.accessToken,

@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Investment } from '@prisma/client';
 import { DashboardRepository } from '../repositories/dashboard.repository';
@@ -13,9 +14,10 @@ import {
   IPortfolioAllocation,
   IPortfolioMetrics,
 } from '../interfaces/dashboard.interface';
+import { ITransaction } from '@/modules/transaction/interfaces/transaction.interface';
 
 interface InvestmentWithTransactions extends Investment {
-  transactions: any[];
+  transactions: ITransaction[];
 }
 
 @Injectable()
@@ -28,78 +30,86 @@ export class DashboardService {
    * Get dashboard summary for user
    */
   async getDashboardSummary(userId: string): Promise<IDashboardSummary> {
-    const user = await this.dashboardRepository.getUserWithPortfolios(userId);
+    try {
+      const user = await this.dashboardRepository.getUserWithPortfolios(userId);
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
 
-    let totalInvestedAllPortfolios = 0;
-    let totalCurrentValueAllPortfolios = 0;
-    let totalInvestmentCount = 0;
-    let totalTransactionCount = 0;
-    const globalAssetBreakdown: Record<string, number> = {
-      MUTUAL_FUND: 0,
-      STOCK: 0,
-      BOND: 0,
-      CRYPTOCURRENCY: 0,
-    };
+      let totalInvestedAllPortfolios = 0;
+      let totalCurrentValueAllPortfolios = 0;
+      let totalInvestmentCount = 0;
+      let totalTransactionCount = 0;
+      const globalAssetBreakdown: Record<string, number> = {
+        MUTUAL_FUND: 0,
+        STOCK: 0,
+        BOND: 0,
+        CRYPTOCURRENCY: 0,
+      };
 
-    const portfolioSummaries: IPortfolioSummary[] = [];
+      const portfolioSummaries: IPortfolioSummary[] = [];
 
-    for (const portfolio of user.portfolios) {
-      const { metrics, assetBreakdown } = this.calculatePortfolioMetrics(
-        portfolio.investments,
-      );
+      for (const portfolio of user.portfolios) {
+        const { metrics, assetBreakdown } = this.calculatePortfolioMetrics(
+          portfolio.investments,
+        );
 
-      totalInvestedAllPortfolios += metrics.totalInvested;
-      totalCurrentValueAllPortfolios += metrics.totalCurrentValue;
-      totalInvestmentCount += portfolio.investments.length;
-      totalTransactionCount += portfolio.transactions.length;
+        totalInvestedAllPortfolios += metrics.totalInvested;
+        totalCurrentValueAllPortfolios += metrics.totalCurrentValue;
+        totalInvestmentCount += portfolio.investments.length;
+        totalTransactionCount += portfolio.transactions.length;
 
-      Object.keys(assetBreakdown).forEach((key) => {
-        globalAssetBreakdown[key] += assetBreakdown[key];
-      });
+        Object.keys(assetBreakdown).forEach((key) => {
+          globalAssetBreakdown[key] += assetBreakdown[key];
+        });
 
-      portfolioSummaries.push({
-        portfolioId: portfolio.id,
-        portfolioName: portfolio.name,
-        ...metrics,
-        assetBreakdown,
-        assetAllocation: this.calculateAssetAllocation(
+        portfolioSummaries.push({
+          portfolioId: portfolio.id,
+          portfolioName: portfolio.name,
+          ...metrics,
           assetBreakdown,
-          metrics.totalCurrentValue,
-        ),
-        createdAt: portfolio.createdAt,
-      });
-    }
+          assetAllocation: this.calculateAssetAllocation(
+            assetBreakdown,
+            metrics.totalCurrentValue,
+          ),
+          createdAt: portfolio.createdAt,
+        });
+      }
 
-    const totalGainLossAllPortfolios =
-      totalCurrentValueAllPortfolios - totalInvestedAllPortfolios;
-    const overallGainLossPercentage =
-      totalInvestedAllPortfolios > 0
-        ? (
-            (totalGainLossAllPortfolios / totalInvestedAllPortfolios) *
-            100
-          ).toFixed(2)
-        : '0.00';
+      const totalGainLossAllPortfolios =
+        totalCurrentValueAllPortfolios - totalInvestedAllPortfolios;
+      const overallGainLossPercentage =
+        totalInvestedAllPortfolios > 0
+          ? (
+              (totalGainLossAllPortfolios / totalInvestedAllPortfolios) *
+              100
+            ).toFixed(2)
+          : '0.00';
 
-    return {
-      userEmail: user.email,
-      totalInvestedAllPortfolios,
-      totalCurrentValueAllPortfolios,
-      totalGainLossAllPortfolios,
-      overallGainLossPercentage,
-      totalPortfolios: user.portfolios.length,
-      totalInvestments: totalInvestmentCount,
-      totalTransactions: totalTransactionCount,
-      globalAssetBreakdown,
-      globalAssetAllocation: this.calculateAssetAllocation(
-        globalAssetBreakdown,
+      return {
+        userEmail: user.email,
+        totalInvestedAllPortfolios,
         totalCurrentValueAllPortfolios,
-      ),
-      portfolios: portfolioSummaries,
-    };
+        totalGainLossAllPortfolios,
+        overallGainLossPercentage,
+        totalPortfolios: user.portfolios.length,
+        totalInvestments: totalInvestmentCount,
+        totalTransactions: totalTransactionCount,
+        globalAssetBreakdown,
+        globalAssetAllocation: this.calculateAssetAllocation(
+          globalAssetBreakdown,
+          totalCurrentValueAllPortfolios,
+        ),
+        portfolios: portfolioSummaries,
+      };
+    } catch (error: unknown) {
+      this.logger.error('Error in getDashboardSummary', (error as Error).stack);
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(
+        'Failed to fetch dashboard summary',
+      );
+    }
   }
 
   /**
@@ -109,32 +119,46 @@ export class DashboardService {
     userId: string,
     portfolioId: string,
   ): Promise<IPortfolioSummary> {
-    const portfolio =
-      await this.dashboardRepository.getPortfolioWithInvestments(portfolioId);
+    try {
+      const portfolio =
+        await this.dashboardRepository.getPortfolioWithInvestments(portfolioId);
 
-    if (!portfolio) {
-      throw new NotFoundException('Portfolio not found');
-    }
+      if (!portfolio) {
+        throw new NotFoundException('Portfolio not found');
+      }
 
-    if (portfolio.userId !== userId) {
-      throw new ForbiddenException('You do not have access to this portfolio');
-    }
+      if (portfolio.userId !== userId) {
+        throw new ForbiddenException(
+          'You do not have access to this portfolio',
+        );
+      }
 
-    const { metrics, assetBreakdown } = this.calculatePortfolioMetrics(
-      portfolio.investments,
-    );
+      const { metrics, assetBreakdown } = this.calculatePortfolioMetrics(
+        portfolio.investments,
+      );
 
-    return {
-      portfolioId: portfolio.id,
-      portfolioName: portfolio.name,
-      ...metrics,
-      assetBreakdown,
-      assetAllocation: this.calculateAssetAllocation(
+      return {
+        portfolioId: portfolio.id,
+        portfolioName: portfolio.name,
+        ...metrics,
         assetBreakdown,
-        metrics.totalCurrentValue,
-      ),
-      createdAt: portfolio.createdAt,
-    };
+        assetAllocation: this.calculateAssetAllocation(
+          assetBreakdown,
+          metrics.totalCurrentValue,
+        ),
+        createdAt: portfolio.createdAt,
+      };
+    } catch (error: unknown) {
+      this.logger.error('Error in getPortfolioSummary', (error as Error).stack);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        'Failed to fetch portfolio summary',
+      );
+    }
   }
 
   /**
@@ -144,23 +168,42 @@ export class DashboardService {
     userId: string,
     portfolioId: string,
   ): Promise<IInvestmentPerformance[]> {
-    const portfolio =
-      await this.dashboardRepository.getPortfolioById(portfolioId);
+    try {
+      const portfolio =
+        await this.dashboardRepository.getPortfolioById(portfolioId);
 
-    if (!portfolio) {
-      throw new NotFoundException('Portfolio not found');
-    }
+      if (!portfolio) {
+        throw new NotFoundException('Portfolio not found');
+      }
 
-    if (portfolio.userId !== userId) {
-      throw new ForbiddenException('You do not have access to this portfolio');
-    }
+      if (portfolio.userId !== userId) {
+        throw new ForbiddenException(
+          'You do not have access to this portfolio',
+        );
+      }
 
-    const investments =
-      await this.dashboardRepository.getInvestmentsWithTransactions(
-        portfolioId,
+      const investments =
+        await this.dashboardRepository.getInvestmentsWithTransactions(
+          portfolioId,
+        );
+
+      return investments.map((investment) =>
+        this.mapToPerformanceDto(investment as InvestmentWithTransactions),
       );
-
-    return investments.map((inv) => this.mapToPerformanceDto(inv));
+    } catch (error: unknown) {
+      this.logger.error(
+        'Error in getInvestmentPerformances',
+        (error as Error).stack,
+      );
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        'Failed to fetch investment performances',
+      );
+    }
   }
 
   /**
@@ -170,45 +213,63 @@ export class DashboardService {
     userId: string,
     portfolioId: string,
   ): Promise<IPortfolioAllocation> {
-    const portfolio =
-      await this.dashboardRepository.getPortfolioWithInvestments(portfolioId);
+    try {
+      const portfolio =
+        await this.dashboardRepository.getPortfolioWithInvestments(portfolioId);
 
-    if (!portfolio) {
-      throw new NotFoundException('Portfolio not found');
+      if (!portfolio) {
+        throw new NotFoundException('Portfolio not found');
+      }
+
+      if (portfolio.userId !== userId) {
+        throw new ForbiddenException(
+          'You do not have access to this portfolio',
+        );
+      }
+
+      const allocation: Record<string, { value: number; allocation: string }> =
+        {
+          MUTUAL_FUND: { value: 0, allocation: '0%' },
+          STOCK: { value: 0, allocation: '0%' },
+          BOND: { value: 0, allocation: '0%' },
+          CRYPTOCURRENCY: { value: 0, allocation: '0%' },
+        };
+
+      let totalValue = 0;
+
+      portfolio.investments.forEach((inv) => {
+        const value = inv.quantity * inv.currentPrice;
+        allocation[inv.type].value += value;
+        totalValue += value;
+      });
+
+      Object.keys(allocation).forEach((key) => {
+        const percentage =
+          totalValue > 0
+            ? ((allocation[key].value / totalValue) * 100).toFixed(2)
+            : '0.00';
+        allocation[key].allocation = `${percentage}%`;
+      });
+
+      return {
+        portfolioId,
+        allocation,
+        totalValue,
+      };
+    } catch (error: unknown) {
+      this.logger.error(
+        'Error in getPortfolioAllocation',
+        (error as Error).stack,
+      );
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        'Failed to fetch portfolio allocation',
+      );
     }
-
-    if (portfolio.userId !== userId) {
-      throw new ForbiddenException('You do not have access to this portfolio');
-    }
-
-    const allocation: Record<string, { value: number; allocation: string }> = {
-      MUTUAL_FUND: { value: 0, allocation: '0%' },
-      STOCK: { value: 0, allocation: '0%' },
-      BOND: { value: 0, allocation: '0%' },
-      CRYPTOCURRENCY: { value: 0, allocation: '0%' },
-    };
-
-    let totalValue = 0;
-
-    portfolio.investments.forEach((inv) => {
-      const value = inv.quantity * inv.currentPrice;
-      allocation[inv.type].value += value;
-      totalValue += value;
-    });
-
-    Object.keys(allocation).forEach((key) => {
-      const percentage =
-        totalValue > 0
-          ? ((allocation[key].value / totalValue) * 100).toFixed(2)
-          : '0.00';
-      allocation[key].allocation = `${percentage}%`;
-    });
-
-    return {
-      portfolioId,
-      allocation,
-      totalValue,
-    };
   }
 
   /**
@@ -219,17 +280,22 @@ export class DashboardService {
     portfolioId: string,
     limit: number = 5,
   ): Promise<IInvestmentPerformance[]> {
-    const performances = await this.getInvestmentPerformances(
-      userId,
-      portfolioId,
-    );
+    try {
+      const performances = await this.getInvestmentPerformances(
+        userId,
+        portfolioId,
+      );
 
-    return performances
-      .sort(
-        (a, b) =>
-          parseFloat(b.gainLossPercentage) - parseFloat(a.gainLossPercentage),
-      )
-      .slice(0, limit);
+      return performances
+        .sort(
+          (a, b) =>
+            parseFloat(b.gainLossPercentage) - parseFloat(a.gainLossPercentage),
+        )
+        .slice(0, limit);
+    } catch (error: unknown) {
+      this.logger.error('Error in getTopPerformers', (error as Error).stack);
+      throw new InternalServerErrorException('Failed to fetch top performers');
+    }
   }
 
   /**
@@ -240,17 +306,24 @@ export class DashboardService {
     portfolioId: string,
     limit: number = 5,
   ): Promise<IInvestmentPerformance[]> {
-    const performances = await this.getInvestmentPerformances(
-      userId,
-      portfolioId,
-    );
+    try {
+      const performances = await this.getInvestmentPerformances(
+        userId,
+        portfolioId,
+      );
 
-    return performances
-      .sort(
-        (a, b) =>
-          parseFloat(a.gainLossPercentage) - parseFloat(b.gainLossPercentage),
-      )
-      .slice(0, limit);
+      return performances
+        .sort(
+          (a, b) =>
+            parseFloat(a.gainLossPercentage) - parseFloat(b.gainLossPercentage),
+        )
+        .slice(0, limit);
+    } catch (error: unknown) {
+      this.logger.error('Error in getBottomPerformers', (error as Error).stack);
+      throw new InternalServerErrorException(
+        'Failed to fetch bottom performers',
+      );
+    }
   }
 
   /**
