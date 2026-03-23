@@ -32,36 +32,45 @@ export class AuthService {
    * @throws ConflictException if user already exists
    */
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { email, password } = registerDto;
+    try {
+      const { email, password } = registerDto;
 
-    // Check if user already exists
-    const existingUser = await this.authRepository.findUserByEmail(email);
-    if (existingUser) {
-      this.logger.warn(`Registration failed: User ${email} already exists`);
-      throw new ConflictException('User with this email already exists');
+      // Check if user already exists
+      const existingUser = await this.authRepository.findUserByEmail(email);
+      if (existingUser) {
+        this.logger.warn(`Registration failed: User ${email} already exists`);
+        throw new ConflictException('User with this email already exists');
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, this.saltRounds);
+
+      // Create user
+      const user = await this.authRepository.createUser({
+        ...registerDto,
+        password: hashedPassword,
+      });
+
+      // Generate tokens
+      const tokens = this.generateTokens(user.id, user.email);
+
+      this.logger.log(`User ${email} registered successfully`);
+
+      return {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`Error in register: ${error.message}`, error.stack);
+      } else {
+        this.logger.error(`Error in register: ${JSON.stringify(error)}`);
+      }
+      throw error;
     }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, this.saltRounds);
-
-    // Create user
-    const user = await this.authRepository.createUser({
-      ...registerDto,
-      password: hashedPassword,
-    });
-
-    // Generate tokens
-    const tokens = this.generateTokens(user.id, user.email);
-
-    this.logger.log(`User ${email} registered successfully`);
-
-    return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    };
   }
 
   /**
@@ -71,44 +80,53 @@ export class AuthService {
    * @throws UnauthorizedException if credentials are invalid
    */
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
-    const { email, password } = loginDto;
+    try {
+      const { email, password } = loginDto;
 
-    // Find user
-    const user = await this.authRepository.findUserByEmail(email);
-    if (!user) {
-      this.logger.warn(`Login failed: User ${email} not found`);
-      throw new UnauthorizedException('Invalid email or password');
+      // Find user
+      const user = await this.authRepository.findUserByEmail(email);
+      if (!user) {
+        this.logger.warn(`Login failed: User ${email} not found`);
+        throw new UnauthorizedException('Invalid email or password');
+      }
+
+      // Verify password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        this.logger.warn(`Login failed: Invalid password for ${email}`);
+        throw new UnauthorizedException('Invalid email or password');
+      }
+
+      // Generate tokens
+      const tokens = this.generateTokens(user.id, user.email);
+
+      // Store refresh token in database (7 days expiration)
+      const refreshTokenExpiresAt = new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000,
+      );
+      await this.authRepository.createRefreshToken(
+        user.id,
+        tokens.refreshToken,
+        refreshTokenExpiresAt,
+      );
+
+      this.logger.log(`User ${email} logged in successfully`);
+
+      return {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`Error in login: ${error.message}`, error.stack);
+      } else {
+        this.logger.error(`Error in login: ${JSON.stringify(error)}`);
+      }
+      throw error;
     }
-
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      this.logger.warn(`Login failed: Invalid password for ${email}`);
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    // Generate tokens
-    const tokens = this.generateTokens(user.id, user.email);
-
-    // Store refresh token in database (7 days expiration)
-    const refreshTokenExpiresAt = new Date(
-      Date.now() + 7 * 24 * 60 * 60 * 1000,
-    );
-    await this.authRepository.createRefreshToken(
-      user.id,
-      tokens.refreshToken,
-      refreshTokenExpiresAt,
-    );
-
-    this.logger.log(`User ${email} logged in successfully`);
-
-    return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    };
   }
 
   /**
@@ -169,41 +187,53 @@ export class AuthService {
     userId: string,
     refreshToken: string,
   ): Promise<{ accessToken: string }> {
-    if (!refreshToken) {
-      throw new BadRequestException('Refresh token is required');
+    try {
+      if (!refreshToken) {
+        throw new BadRequestException('Refresh token is required');
+      }
+
+      // Find stored token
+      const storedToken =
+        await this.authRepository.findRefreshToken(refreshToken);
+
+      if (!storedToken || storedToken.userId !== userId) {
+        this.logger.warn(`Invalid refresh token for user ${userId}`);
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      // Check expiration
+      if (new Date() > storedToken.expiresAt) {
+        this.logger.warn(`Refresh token expired for user ${userId}`);
+        throw new UnauthorizedException('Refresh token has expired');
+      }
+
+      // Find user
+      const user = await this.authRepository.findUserById(userId);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      // Generate new access token (uses module's configured secret)
+      const accessToken = this.jwtService.sign(
+        { sub: user.id, email: user.email },
+        {
+          expiresIn: 3600, // 1 hour in seconds
+        },
+      );
+
+      this.logger.log(`Access token refreshed for user ${userId}`);
+
+      return { accessToken };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `Error in refreshToken: ${error.message}`,
+          error.stack,
+        );
+      } else {
+        this.logger.error(`Error in refreshToken: ${JSON.stringify(error)}`);
+      }
+      throw error;
     }
-
-    // Find stored token
-    const storedToken =
-      await this.authRepository.findRefreshToken(refreshToken);
-
-    if (!storedToken || storedToken.userId !== userId) {
-      this.logger.warn(`Invalid refresh token for user ${userId}`);
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    // Check expiration
-    if (new Date() > storedToken.expiresAt) {
-      this.logger.warn(`Refresh token expired for user ${userId}`);
-      throw new UnauthorizedException('Refresh token has expired');
-    }
-
-    // Find user
-    const user = await this.authRepository.findUserById(userId);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    // Generate new access token (uses module's configured secret)
-    const accessToken = this.jwtService.sign(
-      { sub: user.id, email: user.email },
-      {
-        expiresIn: 3600, // 1 hour in seconds
-      },
-    );
-
-    this.logger.log(`Access token refreshed for user ${userId}`);
-
-    return { accessToken };
   }
 }

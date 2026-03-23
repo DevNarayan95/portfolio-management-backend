@@ -7,7 +7,7 @@ import { JwtPayload, CurrentUser } from '../interfaces/jwt-payload.interface';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
-    const secret = configService.get<string>('JWT_SECRET');
+    const secret = configService.get<string>('app.jwt.secret');
     if (!secret) {
       throw new Error('JWT_SECRET environment variable not set');
     }
