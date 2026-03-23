@@ -39,6 +39,7 @@ export interface IUpdateInvestmentPayload {
   currentPrice?: number;
   notes?: string;
   sipAmount?: number;
+  quantity?: number;
 }
 
 export interface IInvestmentPerformance {

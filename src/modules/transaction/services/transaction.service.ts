@@ -12,6 +12,7 @@ import {
   CreateTransactionDto,
   TransactionResponseDto,
   FilterTransactionDto,
+  TransactionTypeEnum,
 } from '../dtos';
 import {
   ITransaction,
@@ -85,6 +86,18 @@ export class TransactionService {
       throw new BadRequestException('Price cannot be negative');
     }
 
+    // Validate SELL quantity BEFORE creating transaction
+    const updatedQuantity =
+      createTransactionDto.type === TransactionTypeEnum.BUY
+        ? investment.quantity + createTransactionDto.quantity
+        : investment.quantity - createTransactionDto.quantity;
+
+    if (updatedQuantity < 0) {
+      throw new BadRequestException(
+        'Insufficient quantity for SELL transaction',
+      );
+    }
+
     const transaction = await this.transactionRepository.create({
       investmentId,
       portfolioId,
@@ -94,6 +107,11 @@ export class TransactionService {
       amount: createTransactionDto.amount,
       transactionDate: createTransactionDto.transactionDate,
       notes: createTransactionDto.notes,
+    });
+
+    await this.investmentRepository.update(investmentId, {
+      quantity: updatedQuantity,
+      currentPrice: createTransactionDto.price, // latest transaction price = current price
     });
 
     return this.mapToResponseDto(transaction);

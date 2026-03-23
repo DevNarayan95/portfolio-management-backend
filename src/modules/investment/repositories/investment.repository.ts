@@ -112,6 +112,7 @@ export class InvestmentRepository {
           currentPrice: payload.currentPrice,
           notes: payload.notes,
           sipAmount: payload.sipAmount,
+          quantity: payload.quantity,
           updatedAt: new Date(),
         },
       });
