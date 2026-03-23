@@ -4,7 +4,7 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: portfolio_management_postgres
+    container_name: pms_postgres_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -23,10 +23,11 @@ services:
 
   # Backend API
   api:
+    image: pms-backend-api:latest
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: portfolio_management_api
+    container_name: pms_backend_api
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/portfolio_db

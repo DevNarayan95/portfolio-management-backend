@@ -17,6 +17,8 @@ import { InvestmentModule } from './modules/investment/investment.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { UserModule } from './modules/user/user.module';
+import { AssetsModule } from './modules/assets-master/assets.module';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -37,13 +39,14 @@ import { UserModule } from './modules/user/user.module';
     TransactionModule,
     DashboardModule,
     UserModule,
+    AssetsModule,
     EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [
     AppService,
     PinoLoggerService,
-    // PrismaService,
+    PrismaService,
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,

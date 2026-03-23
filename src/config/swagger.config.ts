@@ -118,7 +118,7 @@ export const setupSwagger = (
       displayOperationId: true,
       filter: true,
       showRequestHeaders: true,
-      docExpansion: 'none',
+      docExpansion: 'list',
       defaultModelsExpandDepth: -1,
       tagsSorter: 'alpha',
       operationsSorter: 'method',
